@@ -69,7 +69,7 @@ class Ready {
             foreach($this->closures as $callback){
                 $callback($discord);
             }
-            if(!is_null($this->listeners)){
+            if(isset($this->listeners)){
                 $this->listeners->execEventListeners($discord);
             }
         });
@@ -134,7 +134,7 @@ class Ready {
      * @return void
      */
     public function truncateReadyClosure(){
-        if(!empty($this->closures)){
+        if(!isset($this->closures)){
             unset($this->closures);
         }
     }
