@@ -1,0 +1,23 @@
+{
+    "name": "degeneratezan/dphp-driver",
+    "description": "to simplify and minimize the initialization of discord-php api",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "Ahmad Fauzan",
+        "email": "noxindocraft@gmail.com"
+      }
+    ],
+    "autoload": {
+        "psr-4": {
+            "DPHPDriver\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.4.0",
+        "team-reflex/discord-php" : "v10.0.0-RC5"
+
+      },
+    "minimum-stability": "dev"
+  }
