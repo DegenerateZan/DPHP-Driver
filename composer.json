@@ -18,6 +18,5 @@
         "php": ">=7.4.0",
         "team-reflex/discord-php" : "v10.0.0-RC5"
 
-      },
-    "minimum-stability": "dev"
+      }
   }
