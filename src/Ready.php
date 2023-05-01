@@ -93,7 +93,7 @@ class Ready {
      * @return Discord\Discord
      */
     public function getDiscord(): Discord{
-        return $this->discord;
+        return (isset($this->discord)) ? $this->discord : null;
     }
 
     /**
