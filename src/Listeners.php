@@ -3,55 +3,54 @@
 namespace DPHPDriver;
 
 use Discord\Discord;
-
+use Discord\WebSockets\Event;
 
 /**
- * A Events Listener closures Manager 
+ * A Events Listener closures Manager
  */
-class Listeners {
-
-    private $listeners = [];
+class Listeners
+{
+    /**
+     * @var array $listeners An array that holds the assigned event listener closures.
+     */
+    private array $listeners = [];
     
     /**
-     * to execute the assigned Event Listener closures
+     * Execute the assigned event listener closures.
      *
-     * @return void
+     * @param Discord $discord
      */
-    public function execEventListeners(Discord $discord)
+    public function execEventListeners(Discord $discord): void
     {
-        foreach ($this->listeners as $listener){
-            $type = $listener["eventType"];
+        foreach ($this->listeners as $listener) {
+            $eventType = $listener["eventType"];
             $callback = $listener["callback"];
-            $discord->on($type, $callback);
+            $discord->on($eventType, $callback);
         }
     }
 
-    
     /**
-     * addEventListener a.k.a assign the Event Listener closure
+     * Assign an event listener closure.
      *
-     * NOTE : Don't forget to call execEventLoop() to execute the assigned closures
-     * @param  Discord\WebSockets\Event $eventType Const
-     * @param  callback $callback
-     * @return this
+     * @param Event|string $eventType
+     * @param callable $callback
+     * @return $this
      */
-    public function injectEventListener($eventType,callable $callback){
+    public function addEventListener($eventType, callable $callback): self
+    {
         $listener = [
             "eventType" => $eventType,
-            "callback"  => $callback
+            "callback" => $callback
         ];
-        array_push($this->listeners, $listener);
+        $this->listeners[] = $listener;
         return $this;
     }
 
     /**
-     * to truncate assigned Events closures
-     *
-     * @return void
+     * Truncate assigned event closures.
      */
-    public function truncateEventsClosure(){
-        if(!is_null($this->listeners)){
-            unset($this->listeners);
-        }
+    public function truncateEventClosures(): void
+    {
+        $this->listeners = [];
     }
 }
