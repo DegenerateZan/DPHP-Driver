@@ -4,138 +4,138 @@ namespace DPHPDriver;
 
 use Discord\Discord;
 
-
 /**
  * A Discord Ready Driver
  */
-class Ready {
-    
+class Ready
+{
     /**
-     * a discord options
-     *
-     * @var array
+     * @var array $option A discord options.
      */
-    private array $option;  
-      
+    private array $option;
+
     /**
-     * discord object
-     *
-     * @var Discord
+     * @var Discord|null $discord A discord object.
      */
-    private Discord $discord;    
+    private ?Discord $discord = null;
+
     /**
-     * a collection of closures that'll be executed after the ready event loop has initiated
-     *
-     * @var array
+     * @var array $closures A collection of closures that'll be executed after the ready event loop has initiated.
      */
     private array $closures = [];
-        
-    /**
-     * listeners object
-     *
-     * @var Listeners
-     */
-    private Listeners $listeners;
-    
-    /**
-     * to contains a string that will be echo'ed after the ready event loop has initiated
-     *
-     * @var string
-     */
-    private string $sentences = "";
 
     /**
-     *  a class contructor 
-     *
-     * @param  mixed $discordOptions
-     * @return void
+     * @var Listeners|null $listeners A listeners object.
      */
-    public function __construct(array $discordOptions){
+    private ?Listeners $listeners = null;
+
+    /**
+     * @var string $readyString A string that will be echoed after the ready event loop has initiated. Default value: "Bot is Ready!\n".
+     */
+    private string $readyString = "Bot is Ready!\n";
+
+    /**
+     * Ready constructor.
+     *
+     * @param array $discordOptions
+     */
+    public function __construct(array $discordOptions)
+    {
         $this->option = $discordOptions;
     }
-    
-    /**
-     * To Begin Discord Api initialization
-     * 
-     * @return void
-     */
-    public function initDiscord(){
-     
 
+    /**
+     * Begin Discord API initialization.
+     */
+    public function initDiscord(): void
+    {
         $discord = new Discord($this->option);
-        $discord->on("init", function(Discord $discord){
-            echo $this->sentences;
+        $discord->on("init", function (Discord $discord) {
+            $this->echoReadyString();
             $this->discord = $discord;
-            foreach($this->closures as $callback){
-                $callback($discord);
-            }
-            if(isset($this->listeners)){
-                $this->listeners->execEventListeners($discord);
-            }
+            $this->executeReadyClosures($discord);
+            $this->executeEventListeners($discord);
         });
         $this->discord = $discord;
     }
 
- 
     /**
-     * To invoke the discord api run() method;
-     *
-     * @return void
+     * Invoke the Discord API run() method.
      */
-    public function start(){
+    public function start(): void
+    {
         $this->discord->run();
     }
 
-        
     /**
-     * to Get Discord Instance
+     * Get the Discord instance.
      *
-     * @return Discord\Discord
+     * @return Discord|null
      */
-    public function getDiscord(): Discord{
-        return (isset($this->discord)) ? $this->discord : null;
+    public function getDiscord(): ?Discord
+    {
+        return $this->discord;
     }
 
     /**
-     * to inject closure that'll be executed after ready / init has initiated
-     * @param callable $callback
-     * @return void
-     */
-    public function injectReadyClosure(callable $callback){
-        array_push($this->closures, $callback);
-    }
-        
-    /**
-     * assign a whole blob of listener object, to process it's assigned events closure
-     * 
-     * NOTE : not recommended, because its unmodifiable in a runtime after you assign the whole object, unless you know what you're doing! 
-     * (recomended to call execEventListeners() inside a ready closure instead)
+     * Inject a closure to be executed after ready/init has initiated.
      *
-     * 
-     * @return void
+     * @param callable $callback
      */
-    public function addListeners(Listeners $listeners){
+    public function injectReadyClosure(callable $callback): void
+    {
+        $this->closures[] = $callback;
+    }
+
+    /**
+     * Assign a whole blob of listener objects to process their assigned event closures.
+     *
+     * @param Listeners $listeners
+     */
+    public function addListeners(Listeners $listeners): void
+    {
         $this->listeners = $listeners;
     }
-    
+
     /**
-     * to add any string that will be echo'ed after the ready event loop has initiated
+     * Add a string to be echoed after the ready event loop has initiated.
      *
-     * @param  string $sentences
-     * @return void
+     * @param string $readyString
      */
-    public function addReadyString(string $sentences = "Bot is Ready!\n"){
-        $this->sentences = $sentences;
+    public function addReadyString(string $readyString): void
+    {
+        $this->readyString = $readyString;
     }
 
     /**
-     * to truncate the assigned ready closures
-     *
-     * @return void
+     * Echo the ready string.
      */
-    public function truncateReadyClosure(){
-        if(!isset($this->closures)){
-            unset($this->closures);
+    private function echoReadyString(): void
+    {
+        echo $this->readyString;
+    }
+
+    /**
+     * Execute the assigned ready closures.
+     *
+     * @param Discord $discord
+     */
+    private function executeReadyClosures(Discord $discord): void
+    {
+        foreach ($this->closures as $closure) {
+            $closure($discord);
+        }
+    }
+
+    /**
+     * Execute the assigned event listeners.
+     *
+     * @param Discord $discord
+     */
+    private function executeEventListeners(Discord $discord): void
+    {
+        if ($this->listeners !== null) {
+            $this->listeners->execEventListeners($discord);
         }
     }
 }
